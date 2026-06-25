@@ -38,9 +38,7 @@
       link.innerHTML = `
         <div class="list-title">${escapeHtml(diary.date)} ${escapeHtml(diary.title || "無題の日記")}</div>
         <div class="list-meta">
-          <span class="pill">${escapeHtml(diary.mood || "気分なし")}</span>
-          ${diary.tags ? `<span class="pill">${escapeHtml(diary.tags)}</span>` : ""}
-          ${diary.handwriting_image ? '<span class="pill">手書きあり</span>' : ""}
+          ${diary.generated_image || diary.diary_image ? '<span class="pill">今日の1枚あり</span>' : ""}
         </div>
         <div class="hint">${escapeHtml(summary(diary.body))}</div>
       `;

@@ -59,6 +59,20 @@
           <textarea id="wish-memo" rows="5" placeholder="メモや理由、終わったあとに残したい感想など"></textarea>
         </label>
 
+        <div class="completion-fields">
+          <label>
+            添付写真
+            <input type="file" id="wish-photo" accept="image/*" capture="environment">
+          </label>
+          <div class="action-row">
+            <button class="danger-btn" type="button" id="remove-wish-photo">写真を削除</button>
+          </div>
+          <div class="preview-frame">
+            <p id="no-wish-photo" class="hint">写真は任意です。</p>
+            <img id="wish-photo-preview" class="completion-photo-preview hidden" alt="Wish添付写真プレビュー">
+          </div>
+        </div>
+
         <div id="wish-completion-fields" class="completion-fields hidden">
           <div class="grid-2">
             <label>

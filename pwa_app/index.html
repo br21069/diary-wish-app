@@ -25,7 +25,7 @@
     <section class="page-title">
       <p class="eyebrow">Diary</p>
       <h1 id="page-heading">今日の日記</h1>
-      <p class="subtle">日記と手書きメモは、この端末のブラウザ内に保存されます。</p>
+      <p class="subtle">今日あったこと、考えたことを文章で残します。</p>
     </section>
 
     <section class="panel">
@@ -36,33 +36,14 @@
         </label>
 
         <label>
-          タイトル
+          タイトル（任意）
           <input type="text" id="diary-title" name="title" placeholder="今日のタイトル">
         </label>
 
         <label>
           本文
-          <textarea id="diary-body" name="body" rows="9" placeholder="今日あったこと、考えたことを書く"></textarea>
+          <textarea id="diary-body" name="body" rows="14" placeholder="今日あったこと、考えたことを書く"></textarea>
         </label>
-
-        <div class="grid-2">
-          <label>
-            気分
-            <select id="diary-mood" name="mood">
-              <option value="">選択なし</option>
-              <option value="最高">最高</option>
-              <option value="よい">よい</option>
-              <option value="普通">普通</option>
-              <option value="疲れた">疲れた</option>
-              <option value="しんどい">しんどい</option>
-            </select>
-          </label>
-
-          <label>
-            タグ
-            <input type="text" id="diary-tags" name="tags" placeholder="研究, 旅行, 読書">
-          </label>
-        </div>
 
         <div class="action-row">
           <button class="primary-btn" type="submit">日記を保存</button>
@@ -75,64 +56,11 @@
     <section class="panel">
       <div class="section-header">
         <div>
-          <p class="eyebrow">Photo</p>
-          <h2>写真を添付</h2>
-        </div>
-      </div>
-      <p class="hint">スマホで撮影した写真、またはスマホ内の画像を1枚添付できます。</p>
-      <label>
-        写真を選択
-        <input type="file" id="diary-photo" accept="image/*" capture="environment">
-      </label>
-      <div class="action-row">
-        <button class="danger-btn" type="button" id="remove-diary-photo">写真を削除</button>
-      </div>
-      <p id="diary-photo-message" class="message" role="status"></p>
-      <div class="preview-frame">
-        <p id="no-diary-photo" class="hint">まだ写真は添付されていません。</p>
-        <img id="diary-photo-preview" class="attached-photo-preview hidden" alt="添付写真プレビュー">
-      </div>
-    </section>
-
-    <section class="panel handwriting-panel">
-      <div class="section-header">
-        <div>
-          <p class="eyebrow">Handwriting</p>
-          <h2>手書き日記</h2>
-        </div>
-      </div>
-
-      <div class="canvas-toolbar" aria-label="手書きツール">
-        <label class="inline-control">
-          太さ
-          <input type="range" id="pen-size" min="1" max="24" value="5">
-        </label>
-        <button class="secondary-btn" type="button" id="pen-mode">ペン</button>
-        <button class="secondary-btn" type="button" id="eraser-mode">消しゴム</button>
-        <button class="danger-btn" type="button" id="clear-canvas">全消去</button>
-        <button class="primary-btn" type="button" id="save-handwriting">手書きを保存</button>
-      </div>
-
-      <div class="canvas-wrap">
-        <canvas id="handwriting-canvas" width="1200" height="720"></canvas>
-      </div>
-      <p id="handwriting-message" class="message" role="status"></p>
-
-      <div class="saved-block">
-        <h3>保存済みの手書き</h3>
-        <p id="no-handwriting" class="hint">まだ保存されていません。</p>
-        <img id="saved-handwriting" class="saved-handwriting hidden" alt="保存済みの手書き日記">
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="section-header">
-        <div>
           <p class="eyebrow">Export</p>
-          <h2>日記を1枚の画像にする</h2>
+          <h2>今日の1枚</h2>
         </div>
       </div>
-      <p class="hint">日付、タイトル、本文、気分、タグ、添付写真、手書きメモを縦長のPNGカードにします。</p>
+      <p class="hint">日記本文をもとに、縦長のPNGカードを自動で作ります。</p>
       <div class="action-row">
         <button class="primary-btn" type="button" id="create-diary-image">今日の1枚を作る</button>
         <a class="secondary-btn link-button hidden" id="download-diary-image" download="diary-card.png">PNGを保存</a>
@@ -145,7 +73,6 @@
   </main>
 
   <script src="./js/db.js"></script>
-  <script src="./js/handwriting.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

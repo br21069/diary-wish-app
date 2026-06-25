@@ -2,24 +2,12 @@
   const dateInput = document.getElementById("diary-date");
   const titleInput = document.getElementById("diary-title");
   const bodyInput = document.getElementById("diary-body");
-  const moodInput = document.getElementById("diary-mood");
-  const tagsInput = document.getElementById("diary-tags");
   const diaryForm = document.getElementById("diary-form");
   const diaryMessage = document.getElementById("diary-message");
-  const handwritingMessage = document.getElementById("handwriting-message");
   const diaryImageMessage = document.getElementById("diary-image-message");
-  const diaryPhotoMessage = document.getElementById("diary-photo-message");
   const heading = document.getElementById("page-heading");
-  const savedImage = document.getElementById("saved-handwriting");
-  const noHandwriting = document.getElementById("no-handwriting");
-  const diaryPhotoInput = document.getElementById("diary-photo");
-  const diaryPhotoPreview = document.getElementById("diary-photo-preview");
-  const noDiaryPhoto = document.getElementById("no-diary-photo");
   const diaryImagePreview = document.getElementById("diary-image-preview");
   const downloadDiaryImage = document.getElementById("download-diary-image");
-  const canvas = document.getElementById("handwriting-canvas");
-  const pad = window.HandwritingPad.create(canvas);
-  let attachedPhotoData = "";
 
   function todayString() {
     const now = new Date();
@@ -36,7 +24,7 @@
     element.textContent = text;
     window.setTimeout(() => {
       if (element.textContent === text) element.textContent = "";
-    }, 3200);
+    }, 3000);
   }
 
   function updateUrl(date) {
@@ -48,23 +36,8 @@
     return {
       date: dateInput.value,
       title: titleInput.value.trim(),
-      body: bodyInput.value.trim(),
-      mood: moodInput.value,
-      tags: tagsInput.value.trim(),
-      attached_photo: attachedPhotoData
+      body: bodyInput.value.trim()
     };
-  }
-
-  function showSavedImage(imageData) {
-    if (imageData) {
-      savedImage.src = imageData;
-      savedImage.classList.remove("hidden");
-      noHandwriting.classList.add("hidden");
-    } else {
-      savedImage.removeAttribute("src");
-      savedImage.classList.add("hidden");
-      noHandwriting.classList.remove("hidden");
-    }
   }
 
   function showDiaryCardImage(imageData, date) {
@@ -81,19 +54,6 @@
     downloadDiaryImage.classList.remove("hidden");
   }
 
-  function showAttachedPhoto(imageData) {
-    attachedPhotoData = imageData || "";
-    if (attachedPhotoData) {
-      diaryPhotoPreview.src = attachedPhotoData;
-      diaryPhotoPreview.classList.remove("hidden");
-      noDiaryPhoto.classList.add("hidden");
-    } else {
-      diaryPhotoPreview.removeAttribute("src");
-      diaryPhotoPreview.classList.add("hidden");
-      noDiaryPhoto.classList.remove("hidden");
-    }
-  }
-
   async function loadDiary(date) {
     dateInput.value = date;
     heading.textContent = date === todayString() ? "今日の日記" : `${date} の日記`;
@@ -101,13 +61,7 @@
     const diary = await window.DiaryWishDB.getDiary(date);
     titleInput.value = diary?.title || "";
     bodyInput.value = diary?.body || "";
-    moodInput.value = diary?.mood || "";
-    tagsInput.value = diary?.tags || "";
-    diaryPhotoInput.value = "";
-    showAttachedPhoto(diary?.attached_photo || "");
-    pad.loadImage(diary?.handwriting_image || "");
-    showSavedImage(diary?.handwriting_image || "");
-    showDiaryCardImage(diary?.diary_image || "", date);
+    showDiaryCardImage(diary?.generated_image || diary?.diary_image || "", date);
     updateUrl(date);
   }
 
@@ -121,62 +75,6 @@
     showMessage(diaryMessage, "日記を保存しました。");
     updateUrl(saved.date);
     return saved;
-  }
-
-  async function saveHandwriting() {
-    if (!dateInput.value) {
-      showMessage(handwritingMessage, "日付を選んでください。");
-      return;
-    }
-
-    await window.DiaryWishDB.saveDiary(collectDiaryForm());
-    const imageData = pad.toImageData();
-    await window.DiaryWishDB.saveDiaryImage(dateInput.value, imageData);
-    showSavedImage(imageData);
-    showMessage(handwritingMessage, "手書きを保存しました。");
-  }
-
-  function loadImage(imageData) {
-    return new Promise(resolve => {
-      if (!imageData) {
-        resolve(null);
-        return;
-      }
-
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = imageData;
-    });
-  }
-
-  function resizeImageFile(file, maxWidth = 1200) {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve("");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          const scale = Math.min(1, maxWidth / img.width);
-          const width = Math.round(img.width * scale);
-          const height = Math.round(img.height * scale);
-          const resizedCanvas = document.createElement("canvas");
-          resizedCanvas.width = width;
-          resizedCanvas.height = height;
-          const ctx = resizedCanvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(resizedCanvas.toDataURL("image/jpeg", 0.82));
-        };
-        img.onerror = () => reject(new Error("写真を読み込めませんでした。"));
-        img.src = reader.result;
-      };
-      reader.onerror = () => reject(new Error("写真を読み込めませんでした。"));
-      reader.readAsDataURL(file);
-    });
   }
 
   function wrapLines(ctx, text, maxWidth, maxLines) {
@@ -211,18 +109,6 @@
     return y + lines.length * lineHeight;
   }
 
-  function drawPill(ctx, text, x, y) {
-    if (!text) return 0;
-    ctx.font = "700 28px sans-serif";
-    const width = ctx.measureText(text).width + 44;
-    ctx.fillStyle = "#eef1ea";
-    roundRect(ctx, x, y, width, 48, 24);
-    ctx.fill();
-    ctx.fillStyle = "#586b4b";
-    ctx.fillText(text, x + 22, y + 32);
-    return width;
-  }
-
   function roundRect(ctx, x, y, width, height, radius) {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
@@ -241,17 +127,15 @@
 
     await window.DiaryWishDB.saveDiary(collectDiaryForm());
     const diary = await window.DiaryWishDB.getDiary(dateInput.value);
-    const attachedPhoto = await loadImage(diary?.attached_photo || "");
-    const handwriting = await loadImage(diary?.handwriting_image || "");
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = 1080;
-    exportCanvas.height = 1920;
+    exportCanvas.height = 1600;
     const ctx = exportCanvas.getContext("2d");
 
     ctx.fillStyle = "#f8f7f4";
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
     ctx.fillStyle = "#ffffff";
-    roundRect(ctx, 60, 60, 960, 1800, 28);
+    roundRect(ctx, 60, 60, 960, 1480, 28);
     ctx.fill();
 
     ctx.fillStyle = "#7a8f69";
@@ -259,74 +143,22 @@
     ctx.fillText("Diary", 110, 150);
 
     ctx.fillStyle = "#252525";
-    ctx.font = "800 72px sans-serif";
-    ctx.fillText(diary.date, 110, 245);
+    ctx.font = "800 74px sans-serif";
+    ctx.fillText(diary.date, 110, 250);
 
-    ctx.font = "800 52px sans-serif";
-    const title = diary.title || "無題の日記";
-    let nextY = drawTextBlock(ctx, title, 110, 340, 860, 66, 2) + 35;
-
-    let pillX = 110;
-    const moodWidth = drawPill(ctx, diary.mood ? `気分: ${diary.mood}` : "気分なし", pillX, nextY);
-    pillX += moodWidth + 14;
-    if (diary.tags) drawPill(ctx, `# ${diary.tags}`, pillX, nextY);
-    nextY += 90;
+    let nextY = 350;
+    if (diary.title) {
+      ctx.font = "800 54px sans-serif";
+      nextY = drawTextBlock(ctx, diary.title, 110, nextY, 860, 68, 2) + 46;
+    }
 
     ctx.fillStyle = "#34312d";
-    ctx.font = "400 34px sans-serif";
-    const mediaCount = (attachedPhoto ? 1 : 0) + (handwriting ? 1 : 0);
-    nextY = drawTextBlock(ctx, diary.body || "本文なし", 110, nextY, 860, 52, mediaCount ? 12 : 22) + 34;
+    ctx.font = "400 38px sans-serif";
+    nextY = drawTextBlock(ctx, diary.body || "今日はまだ日記がありません。", 110, nextY, 860, 58, 19);
 
-    if (attachedPhoto) {
-      ctx.fillStyle = "#75706a";
-      ctx.font = "700 28px sans-serif";
-      ctx.fillText("添付写真", 110, nextY);
-      nextY += 24;
-
-      const boxX = 110;
-      const boxY = nextY;
-      const boxW = 860;
-      const boxH = handwriting ? 390 : 620;
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#e7e1d8";
-      ctx.lineWidth = 3;
-      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
-      ctx.fill();
-      ctx.stroke();
-
-      const scale = Math.max(boxW / attachedPhoto.width, boxH / attachedPhoto.height);
-      const drawW = attachedPhoto.width * scale;
-      const drawH = attachedPhoto.height * scale;
-      ctx.save();
-      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
-      ctx.clip();
-      ctx.drawImage(attachedPhoto, boxX + (boxW - drawW) / 2, boxY + (boxH - drawH) / 2, drawW, drawH);
-      ctx.restore();
-      nextY += boxH + 36;
-    }
-
-    if (handwriting) {
-      ctx.fillStyle = "#75706a";
-      ctx.font = "700 28px sans-serif";
-      ctx.fillText("手書きメモ", 110, nextY);
-      nextY += 24;
-
-      const boxX = 110;
-      const boxY = nextY;
-      const boxW = 860;
-      const boxH = attachedPhoto ? 330 : 460;
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#e7e1d8";
-      ctx.lineWidth = 3;
-      roundRect(ctx, boxX, boxY, boxW, boxH, 18);
-      ctx.fill();
-      ctx.stroke();
-
-      const scale = Math.min(boxW / handwriting.width, boxH / handwriting.height);
-      const drawW = handwriting.width * scale;
-      const drawH = handwriting.height * scale;
-      ctx.drawImage(handwriting, boxX + (boxW - drawW) / 2, boxY + (boxH - drawH) / 2, drawW, drawH);
-    }
+    ctx.fillStyle = "#aaa39a";
+    ctx.font = "700 24px sans-serif";
+    ctx.fillText("日記・Wishリストアプリ", 110, 1500);
 
     const imageData = exportCanvas.toDataURL("image/png");
     await window.DiaryWishDB.saveDiaryCardImage(diary.date, imageData);
@@ -358,49 +190,6 @@
 
   document.getElementById("load-today").addEventListener("click", () => {
     loadDiary(todayString());
-  });
-
-  document.getElementById("pen-size").addEventListener("input", event => {
-    pad.setSize(event.target.value);
-  });
-
-  document.getElementById("pen-mode").addEventListener("click", () => {
-    pad.setTool("pen");
-    showMessage(handwritingMessage, "ペンに切り替えました。");
-  });
-
-  document.getElementById("eraser-mode").addEventListener("click", () => {
-    pad.setTool("eraser");
-    showMessage(handwritingMessage, "消しゴムに切り替えました。");
-  });
-
-  document.getElementById("clear-canvas").addEventListener("click", () => {
-    if (confirm("手書きキャンバスを全消去しますか？")) {
-      pad.clear();
-      showMessage(handwritingMessage, "キャンバスを消去しました。保存すると反映されます。");
-    }
-  });
-
-  document.getElementById("save-handwriting").addEventListener("click", () => {
-    saveHandwriting().catch(error => {
-      showMessage(handwritingMessage, `手書き保存に失敗しました: ${error.message}`);
-    });
-  });
-
-  diaryPhotoInput.addEventListener("change", event => {
-    resizeImageFile(event.target.files[0])
-      .then(imageData => {
-        if (!imageData) return;
-        showAttachedPhoto(imageData);
-        showMessage(diaryPhotoMessage, "写真を読み込みました。日記を保存すると反映されます。");
-      })
-      .catch(error => showMessage(diaryPhotoMessage, error.message));
-  });
-
-  document.getElementById("remove-diary-photo").addEventListener("click", () => {
-    showAttachedPhoto("");
-    diaryPhotoInput.value = "";
-    showMessage(diaryPhotoMessage, "写真を削除しました。日記を保存すると反映されます。");
   });
 
   document.getElementById("create-diary-image").addEventListener("click", () => {

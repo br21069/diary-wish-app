@@ -4,6 +4,10 @@
   const categoryInput = document.getElementById("wish-category");
   const titleInput = document.getElementById("wish-title");
   const memoInput = document.getElementById("wish-memo");
+  const wishPhotoInput = document.getElementById("wish-photo");
+  const wishPhotoPreview = document.getElementById("wish-photo-preview");
+  const noWishPhoto = document.getElementById("no-wish-photo");
+  const removeWishPhotoButton = document.getElementById("remove-wish-photo");
   const statusInput = document.getElementById("wish-status");
   const completedAtInput = document.getElementById("wish-completed-at");
   const completionPhotoInput = document.getElementById("wish-completion-photo");
@@ -29,6 +33,7 @@
 
   let formPhotoData = "";
   let panelPhotoData = "";
+  let wishPhotoData = "";
 
   const categoryLabels = {
     work: "仕事",
@@ -75,6 +80,19 @@
     imageElement.classList.remove("hidden");
   }
 
+  function showWishPhoto(imageData) {
+    wishPhotoData = imageData || "";
+    if (wishPhotoData) {
+      wishPhotoPreview.src = wishPhotoData;
+      wishPhotoPreview.classList.remove("hidden");
+      noWishPhoto.classList.add("hidden");
+    } else {
+      wishPhotoPreview.removeAttribute("src");
+      wishPhotoPreview.classList.add("hidden");
+      noWishPhoto.classList.remove("hidden");
+    }
+  }
+
   function toggleCompletionFields() {
     const isDone = statusInput.value === "done";
     completionFields.classList.toggle("hidden", !isDone);
@@ -90,6 +108,7 @@
       category: categoryInput.value,
       title: titleInput.value.trim(),
       memo: memoInput.value.trim(),
+      wish_photo: wishPhotoData,
       status,
       completed_at: status === "done" ? completedAtInput.value : "",
       completion_photo: status === "done" ? formPhotoData : "",
@@ -101,9 +120,11 @@
     idInput.value = "";
     form.reset();
     formPhotoData = "";
+    wishPhotoData = "";
     categoryInput.value = "work";
     statusInput.value = "want";
     form.querySelector(".primary-btn").textContent = "保存";
+    showWishPhoto("");
     showPhotoPreview("", completionPhotoPreview);
     toggleCompletionFields();
   }
@@ -114,6 +135,7 @@
     titleInput.value = wish.title;
     memoInput.value = wish.memo || "";
     statusInput.value = wish.status || "want";
+    showWishPhoto(wish.wish_photo || "");
     completedAtInput.value = wish.completed_at || wish.date_done || "";
     completionNoteInput.value = wish.completion_note || "";
     formPhotoData = wish.completion_photo || "";
@@ -161,6 +183,10 @@
       ${wish.completion_note ? `<div class="hint">${escapeHtml(wish.completion_note)}</div>` : ""}
     ` : "";
 
+    const wantPhoto = status === "want" && wish.wish_photo
+      ? `<img class="completion-photo" src="${escapeAttribute(wish.wish_photo)}" alt="Wish添付写真">`
+      : "";
+
     const wantActions = status === "want"
       ? `<button class="primary-btn" type="button" data-action="complete" data-id="${wish.id}">達成した</button>`
       : `<button class="secondary-btn" type="button" data-action="reopen" data-id="${wish.id}">未達成に戻す</button>`;
@@ -172,6 +198,7 @@
         <span class="pill">${escapeHtml(statusLabels[status] || statusLabels.want)}</span>
       </div>
       ${wish.memo ? `<div class="hint">${escapeHtml(wish.memo)}</div>` : ""}
+      ${wantPhoto}
       ${doneDetails}
       <div class="item-actions">
         ${wantActions}
@@ -284,6 +311,7 @@
           category: normalizeCategory(wish.category),
           title: wish.title,
           memo: wish.memo || "",
+          wish_photo: wish.wish_photo || "",
           status: "done",
           completed_at: completionDateInput.value || todayString(),
           completion_photo: panelPhotoData,
@@ -307,6 +335,15 @@
       .catch(error => showMessage(error.message));
   });
 
+  wishPhotoInput.addEventListener("change", event => {
+    resizeImageFile(event.target.files[0])
+      .then(imageData => {
+        wishPhotoData = imageData || wishPhotoData;
+        showWishPhoto(wishPhotoData);
+      })
+      .catch(error => showMessage(error.message));
+  });
+
   completionPhotoPicker.addEventListener("change", event => {
     resizeImageFile(event.target.files[0])
       .then(imageData => {
@@ -321,6 +358,12 @@
     completionPhotoInput.value = "";
     showPhotoPreview("", completionPhotoPreview);
     showMessage("写真を削除しました。保存すると反映されます。");
+  });
+
+  removeWishPhotoButton.addEventListener("click", () => {
+    showWishPhoto("");
+    wishPhotoInput.value = "";
+    showMessage("Wish写真を削除しました。保存すると反映されます。");
   });
 
   removeCompletionPhotoButton.addEventListener("click", () => {
@@ -363,6 +406,7 @@
           category: normalizeCategory(wish.category),
           title: wish.title,
           memo: wish.memo || "",
+          wish_photo: wish.wish_photo || "",
           status: "want",
           completed_at: "",
           completion_photo: "",

@@ -1,4 +1,4 @@
-const CACHE_NAME = "diary-wish-pwa-v5";
+const CACHE_NAME = "diary-wish-pwa-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
