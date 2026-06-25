@@ -1,6 +1,6 @@
 (function () {
   const DB_NAME = "diary-wish-pwa";
-  const DB_VERSION = 3;
+  const DB_VERSION = 4;
   const DIARY_STORE = "diaries";
   const WISH_STORE = "wishes";
 
@@ -26,7 +26,7 @@
           wishStore.createIndex("updated_at", "updated_at");
         }
 
-        // Versions 2 and 3 add optional fields to existing diary and wish records.
+        // Versions 2-4 add optional fields to existing diary and wish records.
         // IndexedDB records can grow without recreating object stores, so no
         // destructive migration is needed here.
       };
@@ -68,6 +68,10 @@
     return new Date().toISOString();
   }
 
+  function hasOwn(object, key) {
+    return Object.prototype.hasOwnProperty.call(object, key);
+  }
+
   async function getDiary(date) {
     return withStore(DIARY_STORE, "readonly", store => requestToPromise(store.get(date)));
   }
@@ -75,6 +79,8 @@
   async function saveDiary(diary) {
     const existing = await getDiary(diary.date);
     const timestamp = nowIso();
+    const hasAttachedPhoto = hasOwn(diary, "attached_photo");
+    const attachedPhoto = hasAttachedPhoto ? diary.attached_photo || "" : existing?.attached_photo || "";
     const record = {
       date: diary.date,
       title: diary.title || "",
@@ -82,6 +88,11 @@
       mood: diary.mood || "",
       tags: diary.tags || "",
       handwriting_image: diary.handwriting_image || existing?.handwriting_image || "",
+      attached_photo: attachedPhoto,
+      attached_photo_created_at:
+        hasAttachedPhoto && attachedPhoto && attachedPhoto !== existing?.attached_photo
+          ? timestamp
+          : existing?.attached_photo_created_at || "",
       diary_image: diary.diary_image || existing?.diary_image || "",
       diary_image_created_at: diary.diary_image_created_at || existing?.diary_image_created_at || "",
       created_at: existing?.created_at || timestamp,
@@ -102,6 +113,8 @@
       mood: existing?.mood || "",
       tags: existing?.tags || "",
       handwriting_image: imageData || "",
+      attached_photo: existing?.attached_photo || "",
+      attached_photo_created_at: existing?.attached_photo_created_at || "",
       diary_image: existing?.diary_image || "",
       diary_image_created_at: existing?.diary_image_created_at || "",
       created_at: existing?.created_at || timestamp,
@@ -122,6 +135,8 @@
       mood: existing?.mood || "",
       tags: existing?.tags || "",
       handwriting_image: existing?.handwriting_image || "",
+      attached_photo: existing?.attached_photo || "",
+      attached_photo_created_at: existing?.attached_photo_created_at || "",
       diary_image: imageData || "",
       diary_image_created_at: imageData ? timestamp : "",
       created_at: existing?.created_at || timestamp,
@@ -147,14 +162,23 @@
     const isEdit = wish.id !== undefined && wish.id !== null && wish.id !== "";
     const existing = isEdit ? await getWish(Number(wish.id)) : null;
     const status = wish.status || existing?.status || "want";
+    const completedAt = hasOwn(wish, "completed_at")
+      ? wish.completed_at || ""
+      : existing?.completed_at || existing?.date_done || "";
+    const completionPhoto = hasOwn(wish, "completion_photo")
+      ? wish.completion_photo || ""
+      : existing?.completion_photo || "";
+    const completionNote = hasOwn(wish, "completion_note")
+      ? wish.completion_note || ""
+      : existing?.completion_note || "";
     const record = {
-      category: wish.category || existing?.category || "work",
-      title: wish.title || existing?.title || "",
-      memo: wish.memo || existing?.memo || "",
+      category: hasOwn(wish, "category") ? wish.category || "work" : existing?.category || "work",
+      title: hasOwn(wish, "title") ? wish.title || "" : existing?.title || "",
+      memo: hasOwn(wish, "memo") ? wish.memo || "" : existing?.memo || "",
       status,
-      completed_at: status === "done" ? wish.completed_at || existing?.completed_at || existing?.date_done || "" : "",
-      completion_photo: status === "done" ? wish.completion_photo || existing?.completion_photo || "" : "",
-      completion_note: status === "done" ? wish.completion_note || existing?.completion_note || "" : "",
+      completed_at: status === "done" ? completedAt : "",
+      completion_photo: status === "done" ? completionPhoto : "",
+      completion_note: status === "done" ? completionNote : "",
       created_at: existing?.created_at || timestamp,
       updated_at: timestamp
     };

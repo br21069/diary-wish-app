@@ -72,6 +72,28 @@
       <p id="diary-message" class="message" role="status"></p>
     </section>
 
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Photo</p>
+          <h2>写真を添付</h2>
+        </div>
+      </div>
+      <p class="hint">スマホで撮影した写真、またはスマホ内の画像を1枚添付できます。</p>
+      <label>
+        写真を選択
+        <input type="file" id="diary-photo" accept="image/*" capture="environment">
+      </label>
+      <div class="action-row">
+        <button class="danger-btn" type="button" id="remove-diary-photo">写真を削除</button>
+      </div>
+      <p id="diary-photo-message" class="message" role="status"></p>
+      <div class="preview-frame">
+        <p id="no-diary-photo" class="hint">まだ写真は添付されていません。</p>
+        <img id="diary-photo-preview" class="attached-photo-preview hidden" alt="添付写真プレビュー">
+      </div>
+    </section>
+
     <section class="panel handwriting-panel">
       <div class="section-header">
         <div>
@@ -110,7 +132,7 @@
           <h2>日記を1枚の画像にする</h2>
         </div>
       </div>
-      <p class="hint">日付、タイトル、本文、気分、タグ、手書きメモを縦長のPNGカードにします。</p>
+      <p class="hint">日付、タイトル、本文、気分、タグ、添付写真、手書きメモを縦長のPNGカードにします。</p>
       <div class="action-row">
         <button class="primary-btn" type="button" id="create-diary-image">今日の1枚を作る</button>
         <a class="secondary-btn link-button hidden" id="download-diary-image" download="diary-card.png">PNGを保存</a>

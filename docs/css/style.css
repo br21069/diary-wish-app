@@ -278,6 +278,16 @@ textarea:focus {
   background: #fff;
 }
 
+.attached-photo-preview {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
 .completion-fields {
   display: grid;
   gap: 1rem;

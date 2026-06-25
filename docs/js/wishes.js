@@ -10,6 +10,7 @@
   const completionNoteInput = document.getElementById("wish-completion-note");
   const completionPhotoPreview = document.getElementById("wish-completion-photo-preview");
   const completionFields = document.getElementById("wish-completion-fields");
+  const removeWishCompletionPhotoButton = document.getElementById("remove-wish-completion-photo");
   const filterInput = document.getElementById("wish-filter");
   const resetButton = document.getElementById("reset-wish-form");
   const list = document.getElementById("wish-list");
@@ -24,6 +25,7 @@
   const completionNotePanelInput = document.getElementById("completion-note");
   const completionPanelPhotoPreview = document.getElementById("completion-photo-preview");
   const cancelCompletionButton = document.getElementById("cancel-completion");
+  const removeCompletionPhotoButton = document.getElementById("remove-completion-photo");
 
   let formPhotoData = "";
   let panelPhotoData = "";
@@ -312,6 +314,20 @@
         showPhotoPreview(panelPhotoData, completionPanelPhotoPreview);
       })
       .catch(error => showMessage(error.message));
+  });
+
+  removeWishCompletionPhotoButton.addEventListener("click", () => {
+    formPhotoData = "";
+    completionPhotoInput.value = "";
+    showPhotoPreview("", completionPhotoPreview);
+    showMessage("写真を削除しました。保存すると反映されます。");
+  });
+
+  removeCompletionPhotoButton.addEventListener("click", () => {
+    panelPhotoData = "";
+    completionPhotoPicker.value = "";
+    showPhotoPreview("", completionPanelPhotoPreview);
+    showMessage("写真を削除しました。達成保存すると反映されます。");
   });
 
   statusInput.addEventListener("change", toggleCompletionFields);
