@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <title>カレンダー | 日記・Wishリストアプリ</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">日</span>
+      <span>日記・Wish</span>
+    </a>
+    <nav class="tabs" aria-label="メインメニュー">
+      <a href="./index.html">今日</a>
+      <a class="active" href="./calendar.html">カレンダー</a>
+      <a href="./wishes.html">Wish</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="page-title">
+      <p class="eyebrow">Calendar</p>
+      <h1>日付から日記を開く</h1>
+    </section>
+
+    <section class="panel">
+      <div class="form compact-form">
+        <label>
+          日付を選択
+          <input type="date" id="calendar-date">
+        </label>
+        <button class="primary-btn" id="open-date" type="button">この日の日記を開く</button>
+      </div>
+      <p id="calendar-message" class="message" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Saved</p>
+          <h2>保存済みの日記</h2>
+        </div>
+      </div>
+      <div id="diary-list" class="list"></div>
+    </section>
+  </main>
+
+  <script src="./js/db.js"></script>
+  <script src="./js/calendar.js"></script>
+</body>
+</html>

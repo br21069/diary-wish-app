@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <title>Wish | 日記・Wishリストアプリ</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="./index.html">
+      <span class="brand-mark">日</span>
+      <span>日記・Wish</span>
+    </a>
+    <nav class="tabs" aria-label="メインメニュー">
+      <a href="./index.html">今日</a>
+      <a href="./calendar.html">カレンダー</a>
+      <a class="active" href="./wishes.html">Wish</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="page-title">
+      <p class="eyebrow">Wish List</p>
+      <h1>仕事・遊び・本</h1>
+    </section>
+
+    <section class="panel">
+      <form id="wish-form" class="form">
+        <input type="hidden" id="wish-id">
+        <div class="grid-2">
+          <label>
+            カテゴリ
+            <select id="wish-category" required>
+              <option value="work">仕事</option>
+              <option value="play">遊び</option>
+              <option value="book">本</option>
+            </select>
+          </label>
+
+          <label>
+            ステータス
+            <select id="wish-status" required>
+              <option value="want">これから</option>
+              <option value="done">達成済み</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          タイトル
+          <input type="text" id="wish-title" placeholder="やりたいこと、読みたい本など" required>
+        </label>
+
+        <label>
+          メモ
+          <textarea id="wish-memo" rows="5" placeholder="メモや理由、終わったあとに残したい感想など"></textarea>
+        </label>
+
+        <div id="wish-completion-fields" class="completion-fields hidden">
+          <div class="grid-2">
+            <label>
+              達成日
+              <input type="date" id="wish-completed-at">
+            </label>
+
+            <label>
+              写真
+              <input type="file" id="wish-completion-photo" accept="image/*">
+            </label>
+          </div>
+
+          <label>
+            感想
+            <textarea id="wish-completion-note" rows="5" placeholder="達成してみて感じたこと、残しておきたいこと"></textarea>
+          </label>
+
+          <div class="preview-frame">
+            <img id="wish-completion-photo-preview" class="completion-photo-preview hidden" alt="達成写真プレビュー">
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-btn" type="submit">保存</button>
+          <button class="secondary-btn" type="button" id="reset-wish-form">新規入力</button>
+        </div>
+      </form>
+      <p id="wish-message" class="message" role="status"></p>
+    </section>
+
+    <section class="panel hidden" id="completion-panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Done</p>
+          <h2>達成記録を残す</h2>
+        </div>
+      </div>
+      <p class="hint" id="completion-target-title"></p>
+      <form id="completion-form" class="form">
+        <input type="hidden" id="completion-wish-id">
+
+        <div class="grid-2">
+          <label>
+            達成日
+            <input type="date" id="completion-date" required>
+          </label>
+
+          <label>
+            写真
+            <input type="file" id="completion-photo" accept="image/*">
+          </label>
+        </div>
+
+        <label>
+          感想
+          <textarea id="completion-note" rows="5" placeholder="達成してみて感じたこと"></textarea>
+        </label>
+
+        <div class="preview-frame">
+          <img id="completion-photo-preview" class="completion-photo-preview hidden" alt="達成写真プレビュー">
+        </div>
+
+        <div class="action-row">
+          <button class="primary-btn" type="submit">達成済みに保存</button>
+          <button class="secondary-btn" type="button" id="cancel-completion">キャンセル</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Items</p>
+          <h2>Wish一覧</h2>
+        </div>
+        <label class="filter">
+          表示
+          <select id="wish-filter">
+            <option value="all">すべて</option>
+            <option value="work">仕事</option>
+            <option value="play">遊び</option>
+            <option value="book">本</option>
+            <option value="want">これから</option>
+            <option value="done">達成済み</option>
+          </select>
+        </label>
+      </div>
+      <div id="wish-list" class="list"></div>
+    </section>
+  </main>
+
+  <script src="./js/db.js"></script>
+  <script src="./js/wishes.js"></script>
+</body>
+</html>

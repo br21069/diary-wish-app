@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% set title = 'Wish編集' if wish else 'Wish追加' %}
+{% block content %}
+<section class="page-title">
+  <p class="eyebrow">Wish Form</p>
+  <h1>{{ 'Wishを編集' if wish else 'Wishを追加' }}</h1>
+</section>
+
+<form class="card form" method="post">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+  <label>
+    カテゴリ
+    {% set current_category = wish['category'] if wish else 'book' %}
+    <select name="category">
+      {% for c, label in [('book','本'),('place','場所'),('movie','映画'),('todo','やりたいこと')] %}
+        <option value="{{ c }}" {% if current_category == c %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    タイトル
+    <input type="text" name="title" value="{{ wish['title'] if wish else '' }}" placeholder="読みたい本・行きたい場所など">
+  </label>
+
+  <label>
+    メモ
+    <textarea name="memo" rows="6" placeholder="理由、感想、URLなど">{{ wish['memo'] if wish else '' }}</textarea>
+  </label>
+
+  <div class="grid-2">
+    <label>
+      ステータス
+      {% set current_status = wish['status'] if wish else 'want' %}
+      <select name="status">
+        <option value="want" {% if current_status == 'want' %}selected{% endif %}>これからやりたい</option>
+        <option value="done" {% if current_status == 'done' %}selected{% endif %}>達成済み</option>
+      </select>
+    </label>
+    <label>
+      達成日
+      <input type="date" name="date_done" value="{{ wish['date_done'] if wish and wish['date_done'] else '' }}">
+    </label>
+  </div>
+
+  <label>
+    評価 1〜5
+    <input type="number" name="rating" min="1" max="5" value="{{ wish['rating'] if wish and wish['rating'] else '' }}">
+  </label>
+
+  <div class="actions">
+    <button class="primary-btn" type="submit">保存</button>
+    <a class="secondary-btn link-btn" href="{{ url_for('wishes_page') }}">戻る</a>
+  </div>
+</form>
+{% endblock %}

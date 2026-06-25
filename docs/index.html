@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f4">
+  <title>日記・Wishリストアプリ</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="./index.html" aria-label="今日の日記を開く">
+      <span class="brand-mark">日</span>
+      <span>日記・Wish</span>
+    </a>
+    <nav class="tabs" aria-label="メインメニュー">
+      <a class="active" href="./index.html">今日</a>
+      <a href="./calendar.html">カレンダー</a>
+      <a href="./wishes.html">Wish</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="page-title">
+      <p class="eyebrow">Diary</p>
+      <h1 id="page-heading">今日の日記</h1>
+      <p class="subtle">日記と手書きメモは、この端末のブラウザ内に保存されます。</p>
+    </section>
+
+    <section class="panel">
+      <form id="diary-form" class="form">
+        <label>
+          日付
+          <input type="date" id="diary-date" name="date" required>
+        </label>
+
+        <label>
+          タイトル
+          <input type="text" id="diary-title" name="title" placeholder="今日のタイトル">
+        </label>
+
+        <label>
+          本文
+          <textarea id="diary-body" name="body" rows="9" placeholder="今日あったこと、考えたことを書く"></textarea>
+        </label>
+
+        <div class="grid-2">
+          <label>
+            気分
+            <select id="diary-mood" name="mood">
+              <option value="">選択なし</option>
+              <option value="最高">最高</option>
+              <option value="よい">よい</option>
+              <option value="普通">普通</option>
+              <option value="疲れた">疲れた</option>
+              <option value="しんどい">しんどい</option>
+            </select>
+          </label>
+
+          <label>
+            タグ
+            <input type="text" id="diary-tags" name="tags" placeholder="研究, 旅行, 読書">
+          </label>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-btn" type="submit">日記を保存</button>
+          <button class="secondary-btn" type="button" id="load-today">今日へ戻る</button>
+        </div>
+      </form>
+      <p id="diary-message" class="message" role="status"></p>
+    </section>
+
+    <section class="panel handwriting-panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Handwriting</p>
+          <h2>手書き日記</h2>
+        </div>
+      </div>
+
+      <div class="canvas-toolbar" aria-label="手書きツール">
+        <label class="inline-control">
+          太さ
+          <input type="range" id="pen-size" min="1" max="24" value="5">
+        </label>
+        <button class="secondary-btn" type="button" id="pen-mode">ペン</button>
+        <button class="secondary-btn" type="button" id="eraser-mode">消しゴム</button>
+        <button class="danger-btn" type="button" id="clear-canvas">全消去</button>
+        <button class="primary-btn" type="button" id="save-handwriting">手書きを保存</button>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="handwriting-canvas" width="1200" height="720"></canvas>
+      </div>
+      <p id="handwriting-message" class="message" role="status"></p>
+
+      <div class="saved-block">
+        <h3>保存済みの手書き</h3>
+        <p id="no-handwriting" class="hint">まだ保存されていません。</p>
+        <img id="saved-handwriting" class="saved-handwriting hidden" alt="保存済みの手書き日記">
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Export</p>
+          <h2>日記を1枚の画像にする</h2>
+        </div>
+      </div>
+      <p class="hint">日付、タイトル、本文、気分、タグ、手書きメモを縦長のPNGカードにします。</p>
+      <div class="action-row">
+        <button class="primary-btn" type="button" id="create-diary-image">今日の1枚を作る</button>
+        <a class="secondary-btn link-button hidden" id="download-diary-image" download="diary-card.png">PNGを保存</a>
+      </div>
+      <p id="diary-image-message" class="message" role="status"></p>
+      <div class="preview-frame">
+        <img id="diary-image-preview" class="generated-preview hidden" alt="日記カード画像プレビュー">
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/db.js"></script>
+  <script src="./js/handwriting.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% set title = diary_date ~ ' の日記' %}
+{% block content %}
+<section class="page-title">
+  <p class="eyebrow">Diary</p>
+  <h1>{{ diary_date }} の日記</h1>
+</section>
+
+<form class="card form" method="post">
+  <label>
+    日付
+    <input type="date" id="date-picker" value="{{ diary_date }}">
+  </label>
+
+  <label>
+    タイトル
+    <input type="text" name="title" value="{{ diary['title'] if diary else '' }}" placeholder="今日のタイトル">
+  </label>
+
+  <label>
+    本文
+    <textarea name="body" rows="10" placeholder="今日あったこと、考えたことを書く">{{ diary['body'] if diary else '' }}</textarea>
+  </label>
+
+  <div class="grid-2">
+    <label>
+      気分
+      <select name="mood">
+        {% set current_mood = diary['mood'] if diary else '' %}
+        {% for mood in ['', '最高', 'よい', '普通', '疲れた', 'しんどい'] %}
+          <option value="{{ mood }}" {% if mood == current_mood %}selected{% endif %}>{{ mood or '未選択' }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      タグ
+      <input type="text" name="tags" value="{{ diary['tags'] if diary else '' }}" placeholder="研究, 旅行, 読書">
+    </label>
+  </div>
+
+  <button class="primary-btn" type="submit">日記を保存</button>
+</form>
+
+<section class="card handwriting-section">
+  <div class="section-header">
+    <div>
+      <p class="eyebrow">Handwriting</p>
+      <h2>手書き日記</h2>
+    </div>
+    <p class="hint">iPad・スマホでは指やApple Pencilで書けます。</p>
+  </div>
+
+  <div class="canvas-toolbar">
+    <label class="inline-label">太さ
+      <input type="range" id="pen-size" min="1" max="18" value="4">
+    </label>
+    <button type="button" class="secondary-btn" id="pen-mode">ペン</button>
+    <button type="button" class="secondary-btn" id="eraser-mode">消しゴム</button>
+    <button type="button" class="danger-btn" id="clear-canvas">全消去</button>
+    <button type="button" class="primary-btn" id="save-canvas">手書きを保存</button>
+  </div>
+
+  <canvas id="handwriting-canvas" width="1100" height="620"></canvas>
+  <p id="canvas-message" class="message"></p>
+
+  {% if diary and diary['handwriting_image_path'] %}
+    <div class="saved-image-block">
+      <h3>保存済みの手書き</h3>
+      <img id="saved-handwriting" class="saved-handwriting" src="{{ url_for('static', filename=diary['handwriting_image_path']) }}" alt="保存済みの手書き日記">
+    </div>
+  {% else %}
+    <div class="saved-image-block">
+      <h3>保存済みの手書き</h3>
+      <p class="hint">まだ保存されていません。</p>
+      <img id="saved-handwriting" class="saved-handwriting hidden" alt="保存済みの手書き日記">
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.DIARY_DATE = "{{ diary_date }}";
+  const diaryUrlTemplate = "{{ url_for('edit_diary', diary_date='__DATE__') }}";
+</script>
+<script src="{{ url_for('static', filename='js/handwriting.js') }}"></script>
+<script>
+  document.getElementById('date-picker').addEventListener('change', function () {
+    if (this.value) {
+      window.location.href = diaryUrlTemplate.replace('__DATE__', encodeURIComponent(this.value));
+    }
+  });
+</script>
+{% endblock %}

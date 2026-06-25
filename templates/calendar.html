@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% set title = 'カレンダー' %}
+{% block content %}
+<section class="page-title">
+  <p class="eyebrow">Calendar</p>
+  <h1>カレンダーから日記を見る</h1>
+</section>
+
+<section class="card calendar-card">
+  <label>
+    日付を選択
+    <input type="date" id="calendar-date">
+  </label>
+  <button class="primary-btn" id="open-date">この日の日記を開く</button>
+</section>
+
+<section class="card">
+  <div class="section-header">
+    <h2>保存済みの日記</h2>
+  </div>
+  {% if diary_dates %}
+    <div class="diary-list">
+      {% for item in diary_dates %}
+        <a class="list-item" href="{{ url_for('edit_diary', diary_date=item['date']) }}">
+          <span class="list-title">{{ item['date'] }}　{{ item['title'] or '無題の日記' }}</span>
+          <span class="pill">{{ item['mood'] or '気分なし' }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="hint">まだ日記がありません。</p>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const diaryUrlTemplate = "{{ url_for('edit_diary', diary_date='__DATE__') }}";
+
+  document.getElementById('open-date').addEventListener('click', function () {
+    const value = document.getElementById('calendar-date').value;
+    if (value) window.location.href = diaryUrlTemplate.replace('__DATE__', encodeURIComponent(value));
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "name": "Diary & Wish",
+  "short_name": "DiaryWish",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f3ee",
+  "theme_color": "#f3eee7",
+  "description": "個人用の日記・Wishリスト管理アプリ",
+  "icons": []
+}

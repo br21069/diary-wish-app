@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+app.db
+static/uploads/
+node_modules/
+dist/
+.vercel/
+.netlify/
